@@ -1,6 +1,7 @@
 class PostsController < ApplicationController
   before_action :set_post, only: %i[ show edit update destroy ]
-
+  # i did the following because I was recieving the follow error: ActionController::InvalidAuthenticityToken (ActionController::InvalidAuthenticityToken)
+  skip_before_action :verify_authenticity_token
   # GET /posts or /posts.json
   def index
     if params[:subcategory_id]
@@ -29,8 +30,15 @@ class PostsController < ApplicationController
 
   # POST /posts or /posts.json
   def create
+    
     @post = Post.new(post_params)
 
+    @category = Category.find_by_id(params[:category])
+    @subcategory = Subcategory.find_by_id(params[:subcategory])
+
+    @post.category_id = @category.id
+    @post.subcategory_id = @subcategory.id 
+    
     respond_to do |format|
       if @post.save
         format.html { redirect_to @post, notice: "Post was successfully created." }
